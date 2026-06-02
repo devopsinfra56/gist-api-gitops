@@ -19,9 +19,15 @@ data:
           "title": "Pod CPU Usage",
           "type": "timeseries",
           "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "custom": { "lineWidth": 2 }
+            }
+          },
           "targets": [
             {
-              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"gist-api-.*\", container=\"gist-api\"}[5m])) by (namespace, pod)",
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"gist-api-.*\"}[5m])) by (namespace, pod)",
               "legendFormat": "{{ "{{" }}namespace{{ "}}" }} / {{ "{{" }}pod{{ "}}" }}"
             }
           ]
@@ -31,9 +37,15 @@ data:
           "title": "Pod Memory Usage",
           "type": "timeseries",
           "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "custom": { "lineWidth": 2 }
+            }
+          },
           "targets": [
             {
-              "expr": "sum(container_memory_working_set_bytes{namespace=~\"gist-api-.*\", container=\"gist-api\"}) by (namespace, pod)",
+              "expr": "sum(container_memory_working_set_bytes{namespace=~\"gist-api-.*\", pod!=\"\"}) by (namespace, pod)",
               "legendFormat": "{{ "{{" }}namespace{{ "}}" }} / {{ "{{" }}pod{{ "}}" }}"
             }
           ]
@@ -63,10 +75,46 @@ data:
           ]
         },
         {
+          "id": 6,
+          "title": "Network Receive (bytes/s)",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "Bps",
+              "custom": { "lineWidth": 2 }
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(container_network_receive_bytes_total{namespace=~\"gist-api-.*\"}[5m])) by (namespace, pod)",
+              "legendFormat": "{{ "{{" }}namespace{{ "}}" }} / {{ "{{" }}pod{{ "}}" }}"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "title": "Network Transmit (bytes/s)",
+          "type": "timeseries",
+          "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "Bps",
+              "custom": { "lineWidth": 2 }
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(container_network_transmit_bytes_total{namespace=~\"gist-api-.*\"}[5m])) by (namespace, pod)",
+              "legendFormat": "{{ "{{" }}namespace{{ "}}" }} / {{ "{{" }}pod{{ "}}" }}"
+            }
+          ]
+        },
+        {
           "id": 5,
           "title": "HTTP Request Rate (requires /metrics endpoint)",
           "type": "timeseries",
-          "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
+          "gridPos": { "x": 0, "y": 20, "w": 24, "h": 8 },
           "targets": [
             {
               "expr": "sum(rate(http_requests_total{namespace=~\"gist-api-.*\"}[5m])) by (namespace, method, status)",
