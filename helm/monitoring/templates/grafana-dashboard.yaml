@@ -22,7 +22,7 @@ data:
           "targets": [
             {
               "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"gist-api-.*\", container=\"gist-api\"}[5m])) by (namespace, pod)",
-              "legendFormat": "{{namespace}} / {{pod}}"
+              "legendFormat": "{{ "{{" }}namespace{{ "}}" }} / {{ "{{" }}pod{{ "}}" }}"
             }
           ]
         },
@@ -34,7 +34,7 @@ data:
           "targets": [
             {
               "expr": "sum(container_memory_working_set_bytes{namespace=~\"gist-api-.*\", container=\"gist-api\"}) by (namespace, pod)",
-              "legendFormat": "{{namespace}} / {{pod}}"
+              "legendFormat": "{{ "{{" }}namespace{{ "}}" }} / {{ "{{" }}pod{{ "}}" }}"
             }
           ]
         },
@@ -46,7 +46,7 @@ data:
           "targets": [
             {
               "expr": "sum(kube_pod_container_status_restarts_total{namespace=~\"gist-api-.*\"}) by (namespace)",
-              "legendFormat": "{{namespace}}"
+              "legendFormat": "{{ "{{" }}namespace{{ "}}" }}"
             }
           ]
         },
@@ -70,7 +70,7 @@ data:
           "targets": [
             {
               "expr": "sum(rate(http_requests_total{namespace=~\"gist-api-.*\"}[5m])) by (namespace, method, status)",
-              "legendFormat": "{{namespace}} {{method}} {{status}}"
+              "legendFormat": "{{ "{{" }}namespace{{ "}}" }} {{ "{{" }}method{{ "}}" }} {{ "{{" }}status{{ "}}" }}"
             }
           ]
         }
