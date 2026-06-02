@@ -1,0 +1,36 @@
+replicaCount: 1
+
+image:
+  repository: devopsinfra56/gist-api
+  pullPolicy: IfNotPresent
+  # Updated by CI pipeline on each staging deploy
+  tag: "20260602-1937"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 15
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false

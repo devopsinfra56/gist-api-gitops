@@ -1,0 +1,75 @@
+name: Update Image Tag
+
+on:
+  # Triggered by the gist-api CI pipeline after a new image is pushed to Docker Hub
+  repository_dispatch:
+    types: [image-published]
+
+  # Manual trigger — use to promote a specific tag to staging or production
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Image tag (e.g. 20260602-1937)"
+        required: true
+        type: string
+      environment:
+        description: "Target environment"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+
+jobs:
+  create-deploy-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve inputs
+        id: vars
+        run: |
+          TAG="${{ github.event.inputs.image_tag || github.event.client_payload.image_tag }}"
+          ENV="${{ github.event.inputs.environment || github.event.client_payload.environment }}"
+          ENV="${ENV:-dev}"
+
+          case "$ENV" in
+            dev)        VALUES_FILE="helm/gist-api/values-dev.yaml" ;;
+            staging)    VALUES_FILE="helm/gist-api/values-staging.yaml" ;;
+            production) VALUES_FILE="helm/gist-api/values-prodution.yaml" ;;
+          esac
+
+          echo "tag=${TAG}"          >> "$GITHUB_OUTPUT"
+          echo "env=${ENV}"          >> "$GITHUB_OUTPUT"
+          echo "values_file=${VALUES_FILE}" >> "$GITHUB_OUTPUT"
+
+      - name: Update image tag in values file
+        run: |
+          sed -i 's|tag: ".*"|tag: "${{ steps.vars.outputs.tag }}"|' \
+            "${{ steps.vars.outputs.values_file }}"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: deploy/${{ steps.vars.outputs.env }}-${{ steps.vars.outputs.tag }}
+          commit-message: "deploy(${{ steps.vars.outputs.env }}): update image to ${{ steps.vars.outputs.tag }}"
+          title: "deploy(${{ steps.vars.outputs.env }}): update image to ${{ steps.vars.outputs.tag }}"
+          body: |
+            ## Image Update
+
+            | Field | Value |
+            |---|---|
+            | **Environment** | `${{ steps.vars.outputs.env }}` |
+            | **Image** | `devopsinfra56/gist-api:${{ steps.vars.outputs.tag }}` |
+            | **Values file** | `${{ steps.vars.outputs.values_file }}` |
+
+            Merging this PR will trigger ArgoCD to sync the `${{ steps.vars.outputs.env }}` environment on minikube.
+          base: main
+          labels: |
+            deployment
+            ${{ steps.vars.outputs.env }}
