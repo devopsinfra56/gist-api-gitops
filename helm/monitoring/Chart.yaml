@@ -1,0 +1,10 @@
+apiVersion: v2
+name: monitoring
+description: Observability stack for gist-api (Prometheus + Grafana + AlertManager)
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: kube-prometheus-stack
+    version: "65.3.1"
+    repository: https://prometheus-community.github.io/helm-charts

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-gist-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+data:
+  gist-api.json: |-
+    {
+      "title": "gist-api",
+      "uid": "gist-api-overview",
+      "schemaVersion": 38,
+      "version": 1,
+      "refresh": "30s",
+      "panels": [
+        {
+          "id": 1,
+          "title": "Pod CPU Usage",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"gist-api-.*\", container=\"gist-api\"}[5m])) by (namespace, pod)",
+              "legendFormat": "{{namespace}} / {{pod}}"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Pod Memory Usage",
+          "type": "timeseries",
+          "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+          "targets": [
+            {
+              "expr": "sum(container_memory_working_set_bytes{namespace=~\"gist-api-.*\", container=\"gist-api\"}) by (namespace, pod)",
+              "legendFormat": "{{namespace}} / {{pod}}"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Pod Restarts",
+          "type": "stat",
+          "gridPos": { "x": 0, "y": 8, "w": 8, "h": 4 },
+          "targets": [
+            {
+              "expr": "sum(kube_pod_container_status_restarts_total{namespace=~\"gist-api-.*\"}) by (namespace)",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "title": "Running Pods",
+          "type": "stat",
+          "gridPos": { "x": 8, "y": 8, "w": 8, "h": 4 },
+          "targets": [
+            {
+              "expr": "count(kube_pod_status_phase{namespace=~\"gist-api-.*\", phase=\"Running\"})",
+              "legendFormat": "Running pods"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "HTTP Request Rate (requires /metrics endpoint)",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{namespace=~\"gist-api-.*\"}[5m])) by (namespace, method, status)",
+              "legendFormat": "{{namespace}} {{method}} {{status}}"
+            }
+          ]
+        }
+      ]
+    }

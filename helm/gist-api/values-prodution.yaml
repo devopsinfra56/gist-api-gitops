@@ -35,3 +35,8 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 10
   targetCPUUtilizationPercentage: 70
+
+serviceMonitor:
+  enabled: true
+  path: /metrics
+  interval: 30s

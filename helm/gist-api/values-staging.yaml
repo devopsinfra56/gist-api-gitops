@@ -32,3 +32,8 @@ resources:
 
 autoscaling:
   enabled: false
+
+serviceMonitor:
+  enabled: true
+  path: /metrics
+  interval: 30s

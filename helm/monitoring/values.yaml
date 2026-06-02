@@ -1,0 +1,71 @@
+kube-prometheus-stack:
+
+  # ── Grafana ────────────────────────────────────────────────────────────────
+  grafana:
+    enabled: true
+    adminPassword: "admin123"   # change after first login
+
+    # Expose as NodePort so minikube can tunnel to it
+    service:
+      type: NodePort
+      nodePort: 32000
+
+    persistence:
+      enabled: false   # keep simple on minikube
+
+    # Pre-load a dashboard for gist-api
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - name: gist-api
+            orgId: 1
+            folder: gist-api
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/gist-api
+
+    dashboardsConfigMaps:
+      gist-api: grafana-dashboard-gist-api
+
+    grafana.ini:
+      server:
+        root_url: "%(protocol)s://%(domain)s/"
+
+  # ── Prometheus ─────────────────────────────────────────────────────────────
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      retention: 7d
+
+      # Discover ServiceMonitors across ALL namespaces (not just the release namespace)
+      serviceMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorSelector: {}
+      serviceMonitorNamespaceSelector: {}
+
+      # Discover PodMonitors across all namespaces too
+      podMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelector: {}
+      podMonitorNamespaceSelector: {}
+
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+  # ── AlertManager ───────────────────────────────────────────────────────────
+  alertmanager:
+    enabled: true
+
+  # ── Node Exporter — gives CPU, memory, disk, network per node ─────────────
+  nodeExporter:
+    enabled: true
+
+  # ── kube-state-metrics — gives pod, deployment, replica-set metrics ────────
+  kubeStateMetrics:
+    enabled: true
