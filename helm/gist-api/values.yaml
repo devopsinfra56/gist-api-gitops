@@ -161,3 +161,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+serviceMonitor:
+  enabled: false
+  path: /metrics
+  interval: 30s
