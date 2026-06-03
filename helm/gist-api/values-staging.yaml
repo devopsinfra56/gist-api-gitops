@@ -4,7 +4,7 @@ image:
   repository: devopsinfra56/gist-api
   pullPolicy: IfNotPresent
   # Updated by CI pipeline on each staging deploy
-  tag: "20260603-0847"
+  tag: "20260603-2024"
 
 service:
   type: ClusterIP
