@@ -40,7 +40,7 @@ jobs:
           case "$ENV" in
             dev)        VALUES_FILE="helm/gist-api/values-dev.yaml" ;;
             staging)    VALUES_FILE="helm/gist-api/values-staging.yaml" ;;
-            production) VALUES_FILE="helm/gist-api/values-prodution.yaml" ;;
+            production) VALUES_FILE="helm/gist-api/values-production.yaml" ;;
           esac
 
           echo "tag=${TAG}"          >> "$GITHUB_OUTPUT"
