@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: devopsinfra56/gist-api
   pullPolicy: Always
-  tag: "20260602-1937"
+  tag: "20260603-0816"
 
 service:
   type: ClusterIP
